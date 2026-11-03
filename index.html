@@ -49,7 +49,6 @@
             margin: 0 auto;
         }
 
-        /* Categories Section (Drop Zones) */
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -101,10 +100,9 @@
             gap: 8px;
             width: 100%;
             justify-content: center;
-            pointer-events: none; /* Allows taps anywhere inside box to bubble up */
+            pointer-events: none; /* Ensures taps anywhere in box bubble up to box click handler */
         }
 
-        /* Specific Category Theme Colors */
         #cat-energy { border-color: #ffa726; background: #fff8e1; }
         #cat-energy .category-title { color: #e65100; }
 
@@ -112,3 +110,326 @@
         #cat-muscle .category-title { color: #6a1b9a; }
 
         #cat-hydrate { border-color: #29b6f6; background: #e1f5fe; }
+        #cat-hydrate .category-title { color: #01579b; }
+
+        #cat-brain { border-color: #66bb6a; background: #e8f5e9; }
+        #cat-brain .category-title { color: #1b5e20; }
+
+        #cat-treats { border-color: #ef5350; background: #ffebee; }
+        #cat-treats .category-title { color: #c62828; }
+
+        .treats-section {
+            width: 100%;
+        }
+
+        .inventory-section {
+            background: #ffffff;
+            border: 4px dashed #ffb74d;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+        }
+
+        .inventory-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f57c00;
+            margin-bottom: 12px;
+        }
+
+        .food-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            min-height: 100px;
+            align-items: center;
+        }
+
+        .food-card {
+            background: #ffffff;
+            border: 3px solid #cfd8dc;
+            border-radius: 16px;
+            padding: 10px 14px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+            min-height: 54px;
+        }
+
+        .food-card span {
+            font-size: 1.5rem;
+        }
+
+        .food-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+        }
+
+        .food-card.selected {
+            border-color: #1976d2;
+            background: #e3f2fd;
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(25, 118, 210, 0.5);
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1.05); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .placed-item {
+            background: #ffffff;
+            border: 2px solid #b0bec5;
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            pointer-events: none;
+        }
+
+        .success-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+            text-align: center;
+        }
+
+        .success-card {
+            background: #ffffff;
+            color: #333;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .success-card h2 {
+            color: #2e7d32;
+            margin-top: 0;
+            font-size: 2rem;
+        }
+
+        .btn-restart {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+            margin-top: 15px;
+        }
+
+        .btn-restart:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🍎 Fuel My Body & Mind! 🧠</h1>
+    <div class="instructions" id="instruction-banner">
+        <b>Tap a food item</b> below, then <b>tap a category box</b> to sort it!
+    </div>
+
+    <div class="app-container">
+        <div class="categories-grid">
+            <div class="category-box" id="cat-energy" onclick="handleCategoryClick('energy')">
+                <div class="category-title">⚡ Give Energy</div>
+                <div class="items-container" id="items-energy"></div>
+            </div>
+
+            <div class="category-box" id="cat-muscle" onclick="handleCategoryClick('muscle')">
+                <div class="category-title">💪 Build Muscle</div>
+                <div class="items-container" id="items-muscle"></div>
+            </div>
+
+            <div class="category-box" id="cat-hydrate" onclick="handleCategoryClick('hydrate')">
+                <div class="category-title">💧 Hydrate</div>
+                <div class="items-container" id="items-hydrate"></div>
+            </div>
+
+            <div class="category-box" id="cat-brain" onclick="handleCategoryClick('brain')">
+                <div class="category-title">🧠 Helps Brain</div>
+                <div class="items-container" id="items-brain"></div>
+            </div>
+        </div>
+
+        <div class="treats-section">
+            <div class="category-box" id="cat-treats" onclick="handleCategoryClick('treats')" style="min-height: 120px;">
+                <div class="category-title">🛑 Occasional Treats (Sometimes Food)</div>
+                <div class="items-container" id="items-treats"></div>
+            </div>
+        </div>
+
+        <div class="inventory-section">
+            <div class="inventory-title">👇 Tap a Food Item to Select</div>
+            <div class="food-pool" id="food-pool"></div>
+        </div>
+    </div>
+
+    <div class="success-overlay" id="success-modal">
+        <div class="success-card">
+            <h2>🎉 Amazing Job! 🌟</h2>
+            <p style="font-size: 1.1rem; color: #555;">You successfully sorted all the foods and fueled your body and mind like a champion!</p>
+            <button class="btn-restart" onclick="resetGame()">Play Again 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        const foodItems = [
+            { id: 'apple', name: 'Crispy Apple', icon: '🍎', category: 'energy', speech: 'Crispy apple gives energy to play!' },
+            { id: 'banana', name: 'Yellow Banana', icon: '🍌', category: 'energy', speech: 'Yellow banana gives quick play energy!' },
+            { id: 'chicken', name: 'Grilled Chicken', icon: '🍗', category: 'muscle', speech: 'Grilled chicken builds strong muscles!' },
+            { id: 'milk', name: 'Milk / Soy', icon: '🥛', category: 'muscle', speech: 'Milk builds strong muscles and bones!' },
+            { id: 'water', name: 'Fresh Water', icon: '🥛', category: 'hydrate', speech: 'Fresh water keeps your body hydrated!' },
+            { id: 'cucumber', name: 'Cucumber', icon: '🥒', category: 'hydrate', speech: 'Cucumber keeps you refreshed!' },
+            { id: 'berries', name: 'Berries', icon: '🫐', category: 'brain', speech: 'Berries help your brain focus!' },
+            { id: 'avocado', name: 'Avocado / Nuts', icon: '🥑', category: 'brain', speech: 'Avocado helps your brain learn!' },
+            { id: 'donut', name: 'Frosted Donut', icon: '🍩', category: 'treats', speech: 'Frosted donut is an occasional treat!' },
+            { id: 'soda', name: 'Sugary Soda', icon: '🥤', category: 'treats', speech: 'Sugary soda is a sometimes treat!' }
+        ];
+
+        let selectedFoodId = null;
+        let gameState = {};
+
+        function initGame() {
+            gameState = {};
+            foodItems.forEach(item => {
+                gameState[item.id] = null;
+            });
+            render();
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function selectFood(id, event) {
+            if (event) event.stopPropagation();
+            selectedFoodId = id;
+            
+            const item = foodItems.find(f => f.id === id);
+            if (item) {
+                speak(item.speech);
+            }
+
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.add('highlight-target');
+            });
+
+            document.getElementById('instruction-banner').innerHTML = 
+                `<b>Selected: ${item.icon} ${item.name}</b>. Now tap the correct category box above!`;
+
+            render();
+        }
+
+        function handleCategoryClick(targetCategory) {
+            if (!selectedFoodId) {
+                speak("Please tap a food item first!");
+                return;
+            }
+
+            const item = foodItems.find(f => f.id === selectedFoodId);
+            gameState[selectedFoodId] = targetCategory;
+            
+            if (item.category === targetCategory) {
+                speak("Great job!");
+            } else {
+                speak("Let's check if that fits best!");
+            }
+
+            selectedFoodId = null;
+
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('highlight-target');
+            });
+
+            document.getElementById('instruction-banner').innerHTML = 
+                `<b>Tap a food item</b> below, then <b>tap a category box</b> to sort it!`;
+
+            render();
+            checkWinCondition();
+        }
+
+        function render() {
+            const poolEl = document.getElementById('food-pool');
+            poolEl.innerHTML = '';
+
+            let unplacedCount = 0;
+            foodItems.forEach(item => {
+                if (gameState[item.id] === null) {
+                    unplacedCount++;
+                    const btn = document.createElement('div');
+                    btn.className = `food-card ${selectedFoodId === item.id ? 'selected' : ''}`;
+                    btn.innerHTML = `<span>${item.icon}</span> ${item.name}`;
+                    btn.onclick = (e) => selectFood(item.id, e);
+                    poolEl.appendChild(btn);
+                }
+            });
+
+            if (unplacedCount === 0) {
+                poolEl.innerHTML = '<span style="color: #2e7d32; font-weight: bold; font-size: 1.1rem;">All items sorted! Check your score above ✨</span>';
+            }
+
+            const categories = ['energy', 'muscle', 'hydrate', 'brain', 'treats'];
+            categories.forEach(cat => {
+                const container = document.getElementById(`items-${cat}`);
+                container.innerHTML = '';
+
+                foodItems.forEach(item => {
+                    if (gameState[item.id] === cat) {
+                        const badge = document.createElement('div');
+                        badge.className = 'placed-item';
+                        badge.innerHTML = `<span>${item.icon}</span> ${item.name}`;
+                        container.appendChild(badge);
+                    }
+                });
+            });
+        }
+
+        function checkWinCondition() {
+            const allPlaced = foodItems.every(item => gameState[item.id] !== null);
+            if (allPlaced) {
+                speak("Fantastic job! You sorted all the food!");
+                setTimeout(() => {
+                    document.getElementById('success-modal').style.display = 'flex';
+                }, 600);
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('success-modal').style.display = 'none';
+            initGame();
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
